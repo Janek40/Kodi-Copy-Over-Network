@@ -10,6 +10,42 @@ addon_handle = int(sys.argv[1])
 xbmcplugin.setContent(addon_handle, 'movies')
 addon = xbmcaddon.Addon()
 
+class MyListItem():
+    def __init__(self, button, number):
+        self.button = button
+	self.number = number
+
+    def getButton(self):
+        return self.button
+
+    def getNumber(self):
+        return self.number
+
+
+class MyList():
+    def __init__(self, window, x, y, width, height, color, alignment, maxLen):
+	self.window = window
+	self.x = x
+	self.y = y
+	self.width = width
+	self.height = height
+	self.color = color
+	self.alignment = alignment
+	self.maxLen = maxLen
+	self.top     = []
+	self.current = []
+	self.bottom  = []
+	self.count = 0
+
+    def addItem(self, label, func):
+	btn = window.add_button(self.x, self.y, self.width, self.height, self.label, self.color, self.alignment, func)
+        itm = MyListItem(btn, self.count)
+	self.count = self.count + 1
+
+	if len(self.current)<self.maxLen:
+	    self.current.append(itm)
+	elif self.current
+
 
 class MyWindow(xbmcgui.WindowDialog):
     def __init__(self):
@@ -21,15 +57,13 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt5 = self.add_button(700, 500, 250, 80, 'Bt5', '0xFF00FFFF', 6, self.refresh_list)
 	bt6 = self.add_button(700, 600, 250, 80, 'Bt6', '0xFF00FFFF', 6, self.refresh_list)
         
-	bt1.setNavigation(bt1, bt2, bt1, bt3)
-        bt2.setNavigation(bt1, bt2, bt2, bt4)
-	bt3.setNavigation(bt3, bt4, bt1, bt5)
-	bt4.setNavigation(bt3, bt4, bt2, bt6)
-	bt5.setNavigation(bt5, bt6, bt3, bt5)
-	bt6.setNavigation(bt5, bt6, bt4, bt6)
-	self.setFocus(bt1)
+	myList = MyList(self, 360, 160, 300, 200, '0xFFDC143C', 6, 5)
+	myList.addItem("Bleach Episode 01", self.refresh_list)
+	myList.addItem("Bleach Episode 02", self.refresh_list)
+	myList.addItem("Bleach Episode 03", self.refresh_list)
 
-	myList = xbmcgui.ControlList(360, 160, 300, 200)
+	'''
+	myList = xbmcgui.ControlList(360, 160, 300, 200, selectedColor='0xFFDC143C')
 	self.addControl(myList)
 	myList.addItem("Bleach Episode 01")
         myList.addItem("Bleach Episode 02")
@@ -38,8 +72,21 @@ class MyWindow(xbmcgui.WindowDialog):
         myList.addItem("Bleach Episode 05")
         myList.addItem("Bleach Episode 06")
         myList.addItem("Bleach Episode 07")
+        myList.addItem("Bleach Episode 08")
+        myList.addItem("Bleach Episode 09")
 	
-	
+	myList.selectItem(0)
+	'''
+
+	bt1.setNavigation(bt1, bt2, bt1, bt3)
+        bt2.setNavigation(bt1, bt2, bt2, bt4)
+	bt3.setNavigation(bt3, bt4, bt1, bt5)
+	bt4.setNavigation(bt3, bt4, bt2, bt6)
+	bt5.setNavigation(bt5, bt6, bt3, bt5)
+	bt6.setNavigation(bt5, bt6, bt4, bt6)
+	self.setFocus(bt1)
+
+		
 	loc = addon.getAddonInfo('path') + '/resources/image.png'
         #self.addControl(xbmcgui.ControlImage (400, 200, 400, 400, loc))
     
