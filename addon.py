@@ -27,7 +27,6 @@ class ButtonObj():
     def __init__(self, btn, func):
        self.btn = btn
        self.func = func
-       self.column = column
 
     def getButton(self):
         return self.btn
@@ -45,7 +44,6 @@ class MyWindow(xbmcgui.WindowDialog):
 	self.add_button(550, 600, 250, 80, 'Copy selected', '0xFF00FFFF', 6, self.copy_selected)
 	self.add_button(700, 500, 250, 80, 'Ignore me', '0xFF00FFFF', 6, self.copy_selected)
 	self.add_button(700, 600, 250, 80, 'Ignore me', '0xFF00FFFF', 6, self.copy_selected)
-	#self.buttons[0].getButton().setEnabled(True)
 
 	myList = xbmcgui.ControlList(360, 160, 300, 200)
 	self.addControl(myList)
@@ -57,19 +55,23 @@ class MyWindow(xbmcgui.WindowDialog):
         myList.addItem("Bleach Episode 06")
         myList.addItem("Bleach Episode 07")
 	
-	xbmc.log("Length: " + str(myList.size()), level=xbmc.LOGNOTICE)
+	#xbmc.log("Length: " + str(myList.size()), level=xbmc.LOGNOTICE)
 	
 	loc = addon.getAddonInfo('path') + '/resources/image.png'
         #self.addControl(xbmcgui.ControlImage (400, 200, 400, 400, loc))
     
+    def setup_initial(self):
+        self.buttons = []
+	self.numButtons = 0
 
     def add_button(self, x, y, xLen, yLen, text, focusedColor, alignment, myFunc):
-        btn = ButtonObj(xbmcgui.ControlButton(x, y, xLen, yLen, text, focusedColor=focusedColor, alignment=alignment), myFunc)
-	#self.buttons.append(btn)
+        actBtn = xbmcgui.ControlButton(x, y, xLen, yLen, text, focusedColor=focusedColor, alignment=alignment)
+	btn = ButtonObj(actBtn, myFunc)
+	self.buttons.append(btn)
 	self.numButtons = self.numButtons + 1
-	self.addControl(btn.getButton())
-	btn.getButton().setEnabled(False)
-	return btn.getButton()
+	self.addControl(actBtn)
+	actBtn.setEnabled(False)
+	return actBtn
 
    
     def press_button(self):
