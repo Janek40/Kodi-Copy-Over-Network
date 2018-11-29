@@ -23,7 +23,7 @@ class MyListItem():
 
 
 class MyList():
-    def __init__(self, window, x, y, width, height, color, alignment, maxLen):
+    def __init__(self, window, x, y, width, height, color, alignment, maxLen, up, down, left, right):
 	self.window = window
 	self.x = x
 	self.y = y
@@ -32,19 +32,39 @@ class MyList():
 	self.color = color
 	self.alignment = alignment
 	self.maxLen = maxLen
+	self.up = up
+	self.down = down
+	self.left = left
+	self.right = right
 	self.top     = []
 	self.current = []
 	self.bottom  = []
 	self.count = 0
 
     def addItem(self, label, func):
-	btn = window.add_button(self.x, self.y, self.width, self.height, self.label, self.color, self.alignment, func)
+	btn = self.window.add_button(self.x, self.y, self.width, self.height, label, self.color, self.alignment, func)
         itm = MyListItem(btn, self.count)
 	self.count = self.count + 1
 
-	if len(self.current)<self.maxLen:
-	    self.current.append(itm)
-	elif self.current
+	self.current.append(itm)
+        #MAKE A LINKED LIST BASICALLY
+	if self.current==1:
+	    if self.up != None:
+	        btn.controlUp(self.up)
+	    if self.down != None:
+	        btn.controlDown(self.down)
+	    if self.left != None:
+	        btn.controlLeft(self.left)
+	    if self.right != None:
+	        btn.controlRight(self.right)
+	else:
+	    btn.controlUp(self.current[itm.getNumber()-1])
+	    if self.down != None:
+	        btn.controlDown(self.down)
+	    if self.left != None:
+	        btn.controlLeft(self.left)
+	    if self.right != None:
+	        btn.controlRight(self.right)
 
 
 class MyWindow(xbmcgui.WindowDialog):
@@ -57,7 +77,7 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt5 = self.add_button(700, 500, 250, 80, 'Bt5', '0xFF00FFFF', 6, self.refresh_list)
 	bt6 = self.add_button(700, 600, 250, 80, 'Bt6', '0xFF00FFFF', 6, self.refresh_list)
         
-	myList = MyList(self, 360, 160, 300, 200, '0xFFDC143C', 6, 5)
+	myList = MyList(self, 360, 160, 300, 200, '0xFFDC143C', 6, 5, None, bt1, None, None)
 	myList.addItem("Bleach Episode 01", self.refresh_list)
 	myList.addItem("Bleach Episode 02", self.refresh_list)
 	myList.addItem("Bleach Episode 03", self.refresh_list)
