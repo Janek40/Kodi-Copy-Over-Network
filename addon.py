@@ -78,12 +78,10 @@ class MyList():
 	
 	if down != None:
 	    if len(self.bottom)>0:
-	        bott = self.bottom[len(self.bottom)-1]
-		bott.controlDown(down)
-	        down.controlUp(bott)
+		bott = self.bottom[len(self.bottom)-1]
+	        self.down.controlUp(bott)
             else:
 	        bott = self.current[len(self.current)-1]
-		bott.controlDown(down)
 		down.controlUp(bott)
 
     def addItem(self, label, func):
@@ -96,12 +94,8 @@ class MyList():
 
 	    self.current.append(btn)
 	    
-	    if len(self.current)==1:
-	        pass
-	    else:
-	        #Get the button above it, and set that button's DOWN to this
+	    if len(self.current)>1:
 		self.current[len(self.current)-2].controlDown(btn)
-	        #Set this new button's up to the previous button
 	        btn.controlUp(self.current[len(self.current)-2])
 	else:
 	    btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.maxLen-1], self.width, self.height, label, self.color, self.alignment, func)
@@ -142,19 +136,24 @@ class MyList():
 		newY = currY-self.height/2
 		curr.setPosition(curr.getX(), newY)
 	    #show the item in the bottom list
-	    oldBottom = self.current[len(self.current)-1]
 	    newBottom = self.bottom[0]
 	    newBottom.setVisible(True)
-	    oldBottom.controlDown(newBottom)
+	    self.window.setFocus(newBottom)
+	    oldBottom = self.current[len(self.current)-1]
 	    newBottom.controlUp(oldBottom)
+	    oldBottom.controlDown(newBottom)
 	    self.current.append(newBottom)
 	    del self.bottom[0]
-	    self.window.setFocus(newBottom)
+	else:
+	    if self.down != None:
+	        self.window.setFocus(self.down)
+	    
     
     def moveDown(self):
         if len(self.top)>0:
 	    #Move and hide the bottom item
 	    bottomItem = self.current[len(self.current)-1]
+	    bottomItem.controlDown(bottomItem)
 	    bottomItem.setVisible(False)
 	    self.bottom.insert(0, bottomItem)
 	    del self.current[len(self.current)-1]
@@ -170,6 +169,9 @@ class MyList():
 	    self.window.setFocus(newTop)
 	    self.current.insert(0, newTop)
 	    del self.top[len(self.top)-1]
+	else:
+	    if self.up != None:
+	        self.window.setFocus(self.up)
 
     def getTail(self):
         return self.current[len(self.current)-1]
@@ -187,8 +189,8 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt5 = self.add_button(700, 500, 250, 80, 'Bt5', '0xFF00FFFF', 6, self.refresh_list)
 	bt6 = self.add_button(700, 600, 250, 80, 'Bt6', '0xFF00FFFF', 6, self.refresh_list)
         
-	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 10)
-	for x in range(20):
+	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 3)
+	for x in range(4):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
 	myList.setControls(None, bt1, None, None)
