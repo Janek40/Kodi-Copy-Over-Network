@@ -9,6 +9,8 @@ ACTION_NAV_BACK = 92
 ACTION_PREVIOUS_MENU = 10
 ACTION_DOWN = 4
 ACTION_UP = 3
+ACTION_LEFT = 1
+ACTION_RIGHT = 2
 
 addon_handle = int(sys.argv[1])
 xbmcplugin.setContent(addon_handle, 'movies')
@@ -78,7 +80,6 @@ class MyList():
 	    self.right.controlLeft(self.current[0])
 	
 	if up != None:
-	    #self.current[0].controlUp(up)
 	    self.up.controlDown(self.current[0])
 	
 	if down != None:
@@ -110,7 +111,8 @@ class MyList():
 	    
     def notifyAction(self, action):
 	actionId = action.getId()
-        if actionId == ACTION_DOWN:
+        logMe(str(actionId))
+	if actionId == ACTION_DOWN:
 	    self.SCROLL_UP = False
 	    if self.SCROLL_DOWN == True:
 	        self.moveUp()
@@ -127,6 +129,10 @@ class MyList():
 	        itemId = self.window.getFocusId()
 		if itemId == self.current[0].getId():
 		    self.SCROLL_UP = True
+	elif actionId == ACTION_LEFT or actionId == ACTION_RIGHT:
+	    itemId = self.window.getFocusId()
+	    if itemId == self.current[0].getId():
+	        self.SCROLL_UP = True
 
     def moveUp(self):
 	if len(self.bottom)>0:
@@ -141,8 +147,10 @@ class MyList():
 		newY = currY-self.height/2
 		curr.setPosition(curr.getX(), newY)
 	    #Set the left thing
-	    self.left.controlRight(self.current[0])
-	    self.right.controlLeft(self.current[0])
+	    if self.left != None:
+	        self.left.controlRight(self.current[0])
+	    if self.right != None:
+	        self.right.controlLeft(self.current[0])
 	    #show the item in the bottom list
 	    newBottom = self.bottom[0]
 	    newBottom.setVisible(True)
@@ -177,8 +185,10 @@ class MyList():
 	    self.window.setFocus(newTop)
 	    self.current.insert(0, newTop)
 	    del self.top[len(self.top)-1]
-	    self.left.controlRight(self.current[0])
-	    self.right.controlLeft(self.current[0])
+	    if self.left != None:
+	        self.left.controlRight(self.current[0])
+	    if self.right != None:
+	        self.right.controlLeft(self.current[0])
 	else:
 	    if self.up != None:
 	        self.window.setFocus(self.up)
