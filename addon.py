@@ -37,6 +37,10 @@ class MyList():
 	self.heightOffsetPos = 0
 	self.SCROLL_DOWN = False
 	self.SCROLL_UP = False
+	self.up = None
+	self.down = None
+	self.left = None
+	self.right = None
 
 	self.heightOffsets = []
 	for x in range(maxLen):
