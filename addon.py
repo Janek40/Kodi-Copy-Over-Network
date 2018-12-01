@@ -38,7 +38,6 @@ class MyList():
 	self.count = 0
 	self.heightOffset = 0
 	self.heightOffsetPos = 0
-	self.heightOffsetPos2 = maxLen-1
 	self.SCROLL_DOWN = False
 	self.SCROLL_UP = False
 
@@ -79,14 +78,10 @@ class MyList():
 	        if self.right != None:
 	            btn.controlRight(self.right)
 	else:
-	    if self.heightOffsetPos2==-1:
-	        self.heightOffsetPos2 = self.maxLen-1
-
-	    btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.heightOffsetPos2], self.width, self.height, label, self.color, self.alignment, func)
-	    self.heightOffsetPos2 = self.heightOffsetPos2 - 1
+	    btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.maxLen-1], self.width, self.height, label, self.color, self.alignment, func)
 
 	    self.bottom.append(btn)
-	    btn.setVisible(True)
+	    btn.setVisible(False)
 	    
     def notifyAction(self, action):
 	actionId = action.getId()
@@ -110,11 +105,17 @@ class MyList():
 
     def moveUp(self):
 	if len(self.bottom)>0:
-	    #move and hide the top item
+	    #hide the top item
 	    topItem = self.current[0]
 	    topItem.setVisible(False)
 	    self.top.append(topItem)
 	    del self.current[0]
+	    #move up
+	    for curr in self.current:
+	        currY = curr.getY()
+		newY = currY-self.height/2
+		curr.setPosition(curr.getX(), newY)
+		#logMe("New Position: " + str(curr.getX()) + ", " + str(newY))
 	    #show the item in the bottom list
 	    oldBottom = self.current[len(self.current)-1]
 	    newBottom = self.bottom[0]
@@ -134,6 +135,12 @@ class MyList():
 	    bottomItem.setVisible(False)
 	    self.bottom.insert(0, bottomItem)
 	    del self.current[len(self.current)-1]
+	    #Move down
+	    for curr in self.current:
+	        currY = curr.getY()
+		newY = currY+self.height/2
+		curr.setPosition(curr.getX(), newY)
+	    
 	    #Show and add the new top item
 	    newTop = self.top[len(self.top)-1]
 	    newTop.setVisible(True)
@@ -157,12 +164,9 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt5 = self.add_button(700, 500, 250, 80, 'Bt5', '0xFF00FFFF', 6, self.refresh_list)
 	bt6 = self.add_button(700, 600, 250, 80, 'Bt6', '0xFF00FFFF', 6, self.refresh_list)
         
-	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 3, None, None, None, None)
-	myList.addItem("Bleach Episode 01", self.refresh_list)
-	myList.addItem("Bleach Episode 02", self.refresh_list)
-	myList.addItem("Bleach Episode 03", self.refresh_list)
-	myList.addItem("Bleach Episode 04", self.refresh_list)
-	myList.addItem("Bleach Episode 05", self.refresh_list)
+	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 10, None, None, None, None)
+	for x in range(20):
+	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
         
 	self.setFocus(myList.getHead())
