@@ -18,18 +18,6 @@ def logMe(text):
     xbmc.log(text, level=xbmc.LOGNOTICE)
     
 
-class MyListItem():
-    def __init__(self, button, number):
-        self.button = button
-	self.number = number
-
-    def getButton(self):
-        return self.button
-
-    def getNumber(self):
-        return self.number
-
-
 class MyList():
     def __init__(self, window, x, y, width, height, color, alignment, maxLen, up, down, left, right):
 	self.window = window
@@ -49,19 +37,30 @@ class MyList():
 	self.bottom  = []
 	self.count = 0
 	self.heightOffset = 0
+	self.heightOffsetPos = 0
 	self.SCROLL_DOWN = False
 	self.SCROLL_UP = False
 
+	self.heightOffsets = []
+	for x in range(maxLen):
+	    self.heightOffsets.append(self.heightOffset)
+            self.heightOffset = self.heightOffset + self.height/2
+
+
     def addItem(self, label, func):
-	btn = self.window.add_button(self.x, self.y+self.heightOffset, self.width, self.height, label, self.color, self.alignment, func)
-        itm = MyListItem(btn, self.count)
-	self.count = self.count + 1
+	if self.heightOffsetPos==self.maxLen:
+	    self.heightOffsetPos = 0
 	
-	self.heightOffset = self.heightOffset + self.height/2
+	btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.heightOffsetPos], self.width, self.height, label, self.color, self.alignment, func)
+        #itm = MyListItem(btn, self.count)
+	#self.count = self.count + 1
+	self.heightOffsetPos = self.heightOffsetPos + 1
+
+	#self.heightOffset = self.heightOffset + self.height/2
 	if self.maxLen>len(self.current):
-	    self.current.append(itm)
+	    self.current.append(btn)
 	    
-	    if self.current==1:
+	    if len(self.current)==1:
 	        if self.up != None:
 	            btn.controlUp(self.up)
 	        if self.down != None:
@@ -72,9 +71,9 @@ class MyList():
 	            btn.controlRight(self.right)
 	    else:
 	        #Get the button above it, and set that button's DOWN to this
-	        self.current[itm.getNumber()-1].getButton().controlDown(btn)
+		self.current[len(self.current)-2].controlDown(btn)
 	        #Set this new button's up to the previous button
-	        btn.controlUp(self.current[itm.getNumber()-1].getButton())
+	        btn.controlUp(self.current[len(self.current)-2])
 	        if self.down != None:
 	            btn.controlDown(self.down)
 	        if self.left != None:
@@ -82,8 +81,8 @@ class MyList():
 	        if self.right != None:
 	            btn.controlRight(self.right)
 	else:
-	    self.bottom.append(itm)
-	    itm.getButton().setVisible(False)
+	    self.bottom.append(btn)
+	    btn.setVisible(False)
 	    
     def notifyAction(self, action):
 	actionId = action.getId()
@@ -94,7 +93,7 @@ class MyList():
 	    else:
 	        itemId = self.window.getFocusId()
 	        #If the focused item is the last in the list, then the next down press needs to scroll the list!
-	        if itemId == self.current[len(self.current)-1].getButton().getId():
+	        if itemId == self.current[len(self.current)-1].getId():
 	            self.SCROLL_DOWN = True
         elif actionId == ACTION_UP:
 	    self.SCROLL_DOWN = False
@@ -102,7 +101,7 @@ class MyList():
 	        self.moveDown()
 	    else:
 	        itemId = self.window.getFocusId()
-		if itemId == self.current[0].getButton().getId():
+		if itemId == self.current[0].getId():
 		    self.SCROLL_UP = True
 
     def moveUp(self):
@@ -110,16 +109,16 @@ class MyList():
 	    #move and hide the top item
 	    #if len(self.bottom)>1:
 	    topItem = self.current[0]
-	    topItem.getButton().setVisible(False)
+	    topItem.setVisible(False)
 	    self.top.append(topItem)
 	    del self.current[0]
 	    #show the item in the bottom list
 	    oldBottom = self.current[len(self.current)-1]
 	    newBottom = self.bottom[0]
-	    newBottom.getButton().setVisible(True)
-	    self.window.setFocus(newBottom.getButton())
-	    oldBottom.getButton().controlDown(newBottom.getButton())
-	    newBottom.getButton().controlUp(oldBottom.getButton())
+	    newBottom.setVisible(True)
+	    self.window.setFocus(newBottom)
+	    oldBottom.controlDown(newBottom)
+	    newBottom.controlUp(oldBottom)
 	    self.current.append(newBottom)
 	    del self.bottom[0]
 
@@ -129,21 +128,21 @@ class MyList():
         if len(self.top)>0:
 	    #Move and hide the bottom item
 	    bottomItem = self.current[len(self.current)-1]
-	    bottomItem.getButton().setVisible(False)
+	    bottomItem.setVisible(False)
 	    self.bottom.insert(0, bottomItem)
 	    del self.current[len(self.current)-1]
 	    #Show and add the new top item
 	    newTop = self.top[len(self.top)-1]
-	    newTop.getButton().setVisible(True)
-	    self.window.setFocus(newTop.getButton())
+	    newTop.setVisible(True)
+	    self.window.setFocus(newTop)
 	    self.current.insert(0, newTop)
 	    del self.top[len(self.top)-1]
 
     def getTail(self):
-        return self.current[len(self.current)-1].getButton()
+        return self.current[len(self.current)-1]
 
     def getHead(self):
-        return self.current[0].getButton()
+        return self.current[0]
 
 class MyWindow(xbmcgui.WindowDialog):
     def __init__(self):
