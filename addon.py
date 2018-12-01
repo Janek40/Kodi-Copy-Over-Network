@@ -19,7 +19,7 @@ def logMe(text):
     
 
 class MyList():
-    def __init__(self, window, x, y, width, height, color, alignment, maxLen, up, down, left, right):
+    def __init__(self, window, x, y, width, height, color, alignment, maxLen):
 	self.window = window
 	self.x = x
 	self.y = y
@@ -28,14 +28,9 @@ class MyList():
 	self.color = color
 	self.alignment = alignment
 	self.maxLen = maxLen
-	self.up = up
-	self.down = down
-	self.left = left
-	self.right = right
 	self.top     = []
 	self.current = []
 	self.bottom  = []
-	self.count = 0
 	self.heightOffset = 0
 	self.heightOffsetPos = 0
 	self.SCROLL_DOWN = False
@@ -46,6 +41,50 @@ class MyList():
 	    self.heightOffsets.append(self.heightOffset)
             self.heightOffset = self.heightOffset + self.height/2
 
+    def setControls(self, up, down, left, right):
+        self.up = up
+	self.down = down
+	self.left = left
+	self.right = right
+	if left != None and right != None:
+	    for x in self.top:
+	        x.controlLeft(left)
+		x.controlRight(right)
+	    for x in self.current:
+	        x.controlLeft(left)
+		x.controlRight(right)
+            for x in self.bottom:
+	        x.controlLeft(left)
+		x.controlRight(right)
+
+	elif left != None:
+	    for x in self.top:
+	        x.controlLeft(left)
+	    for x in self.current:
+	        x.controlLeft(left)
+            for x in self.bottom:
+	        x.controlLeft(left)
+
+        elif right != None:
+            for x in self.top:
+	        x.controlLeft(right)
+            for x in self.current:
+	        x.controlLeft(right)
+            for x in self.bottom:
+	        x.controlLeft(right)
+
+	if up != None:
+	    self.current[0].controlUp(up)
+	
+	if down != None:
+	    if len(self.bottom)>0:
+	        bott = self.bottom[len(self.bottom)-1]
+		bott.controlDown(down)
+	        down.controlUp(bott)
+            else:
+	        bott = self.current[len(self.current)-1]
+		bott.controlDown(down)
+		down.controlUp(bott)
 
     def addItem(self, label, func):
 	if self.maxLen>len(self.current):
@@ -58,25 +97,12 @@ class MyList():
 	    self.current.append(btn)
 	    
 	    if len(self.current)==1:
-	        if self.up != None:
-	            btn.controlUp(self.up)
-	        if self.down != None:
-	            btn.controlDown(self.down)
-	        if self.left != None:
-	            btn.controlLeft(self.left)
-	        if self.right != None:
-	            btn.controlRight(self.right)
+	        pass
 	    else:
 	        #Get the button above it, and set that button's DOWN to this
 		self.current[len(self.current)-2].controlDown(btn)
 	        #Set this new button's up to the previous button
 	        btn.controlUp(self.current[len(self.current)-2])
-	        if self.down != None:
-	            btn.controlDown(self.down)
-	        if self.left != None:
-	            btn.controlLeft(self.left)
-	        if self.right != None:
-	            btn.controlRight(self.right)
 	else:
 	    btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.maxLen-1], self.width, self.height, label, self.color, self.alignment, func)
 
@@ -115,18 +141,15 @@ class MyList():
 	        currY = curr.getY()
 		newY = currY-self.height/2
 		curr.setPosition(curr.getX(), newY)
-		#logMe("New Position: " + str(curr.getX()) + ", " + str(newY))
 	    #show the item in the bottom list
 	    oldBottom = self.current[len(self.current)-1]
 	    newBottom = self.bottom[0]
 	    newBottom.setVisible(True)
-	    self.window.setFocus(newBottom)
 	    oldBottom.controlDown(newBottom)
 	    newBottom.controlUp(oldBottom)
 	    self.current.append(newBottom)
 	    del self.bottom[0]
-
-
+	    self.window.setFocus(newBottom)
     
     def moveDown(self):
         if len(self.top)>0:
@@ -164,14 +187,15 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt5 = self.add_button(700, 500, 250, 80, 'Bt5', '0xFF00FFFF', 6, self.refresh_list)
 	bt6 = self.add_button(700, 600, 250, 80, 'Bt6', '0xFF00FFFF', 6, self.refresh_list)
         
-	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 10, None, None, None, None)
+	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 10)
 	for x in range(20):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
+	myList.setControls(None, bt1, None, None)
         
 	self.setFocus(myList.getHead())
 
-	bt1.setNavigation(myList.getTail(), bt2, bt1, bt3)
+	#bt1.setNavigation(myList.getTail(), bt2, bt1, bt3)
         bt2.setNavigation(bt1, bt2, bt2, bt4)
 	bt3.setNavigation(bt3, bt4, bt1, bt5)
 	bt4.setNavigation(bt3, bt4, bt2, bt6)
