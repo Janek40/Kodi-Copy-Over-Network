@@ -56,6 +56,8 @@ class MyList():
             for x in self.bottom:
 	        x.controlLeft(left)
 		x.controlRight(right)
+	    self.left.controlRight(self.current[0])
+	    self.right.controlLeft(self.current[0])
 
 	elif left != None:
 	    for x in self.top:
@@ -64,6 +66,7 @@ class MyList():
 	        x.controlLeft(left)
             for x in self.bottom:
 	        x.controlLeft(left)
+	    self.left.controlRight(self.current[0])
 
         elif right != None:
             for x in self.top:
@@ -72,9 +75,11 @@ class MyList():
 	        x.controlLeft(right)
             for x in self.bottom:
 	        x.controlLeft(right)
-
+	    self.right.controlLeft(self.current[0])
+	
 	if up != None:
-	    self.current[0].controlUp(up)
+	    #self.current[0].controlUp(up)
+	    self.up.controlDown(self.current[0])
 	
 	if down != None:
 	    if len(self.bottom)>0:
@@ -135,6 +140,9 @@ class MyList():
 	        currY = curr.getY()
 		newY = currY-self.height/2
 		curr.setPosition(curr.getX(), newY)
+	    #Set the left thing
+	    self.left.controlRight(self.current[0])
+	    self.right.controlLeft(self.current[0])
 	    #show the item in the bottom list
 	    newBottom = self.bottom[0]
 	    newBottom.setVisible(True)
@@ -169,6 +177,8 @@ class MyList():
 	    self.window.setFocus(newTop)
 	    self.current.insert(0, newTop)
 	    del self.top[len(self.top)-1]
+	    self.left.controlRight(self.current[0])
+	    self.right.controlLeft(self.current[0])
 	else:
 	    if self.up != None:
 	        self.window.setFocus(self.up)
@@ -182,28 +192,18 @@ class MyList():
 class MyWindow(xbmcgui.WindowDialog):
     def __init__(self):
         self.initial_setup()
-	bt1 = self.add_button(340, 500, 220, 80, 'Bt1', '0xFF00FFFF', 6, self.refresh_list)	
-	bt2 = self.add_button(340, 600, 220, 80, 'Bt2', '0xFF00FFFF', 6, self.refresh_list)
-	bt3 = self.add_button(550, 500, 250, 80, 'Bt3', '0xFF00FFFF', 6, self.refresh_list)
-	bt4 = self.add_button(550, 600, 250, 80, 'Bt4', '0xFF00FFFF', 6, self.refresh_list)
-	bt5 = self.add_button(700, 500, 250, 80, 'Bt5', '0xFF00FFFF', 6, self.refresh_list)
-	bt6 = self.add_button(700, 600, 250, 80, 'Bt6', '0xFF00FFFF', 6, self.refresh_list)
+	bt1 = self.add_button(340, 200, 220, 80, 'Bt1', '0xFF00FFFF', 6, self.refresh_list)	
+	bt2 = self.add_button(100, 300, 220, 80, 'Bt2', '0xFF00FFFF', 6, self.refresh_list)
+	bt3 = self.add_button(650, 300, 250, 80, 'Bt3', '0xFF00FFFF', 6, self.refresh_list)
+	bt4 = self.add_button(340, 500, 250, 80, 'Bt4', '0xFF00FFFF', 6, self.refresh_list)
         
-	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 3)
+	myList = MyList(self, 360, 300, 350, 50, '0xFFDC143C', 6, 3)
 	for x in range(4):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
-	myList.setControls(None, bt1, None, None)
+	myList.setControls(bt1, bt4, bt2, bt3)
         
 	self.setFocus(myList.getHead())
-
-	#bt1.setNavigation(myList.getTail(), bt2, bt1, bt3)
-        bt2.setNavigation(bt1, bt2, bt2, bt4)
-	bt3.setNavigation(bt3, bt4, bt1, bt5)
-	bt4.setNavigation(bt3, bt4, bt2, bt6)
-	bt5.setNavigation(bt5, bt6, bt3, bt5)
-	bt6.setNavigation(bt5, bt6, bt4, bt6)
-	#self.setFocus(bt1)
 
 		
 	loc = addon.getAddonInfo('path') + '/resources/image.png'
