@@ -38,6 +38,7 @@ class MyList():
 	self.count = 0
 	self.heightOffset = 0
 	self.heightOffsetPos = 0
+	self.heightOffsetPos2 = maxLen-1
 	self.SCROLL_DOWN = False
 	self.SCROLL_UP = False
 
@@ -48,16 +49,13 @@ class MyList():
 
 
     def addItem(self, label, func):
-	if self.heightOffsetPos==self.maxLen:
-	    self.heightOffsetPos = 0
-	
-	btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.heightOffsetPos], self.width, self.height, label, self.color, self.alignment, func)
-        #itm = MyListItem(btn, self.count)
-	#self.count = self.count + 1
-	self.heightOffsetPos = self.heightOffsetPos + 1
-
-	#self.heightOffset = self.heightOffset + self.height/2
 	if self.maxLen>len(self.current):
+	    if self.heightOffsetPos==self.maxLen:
+	        self.heightOffsetPos = 0
+
+	    btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.heightOffsetPos], self.width, self.height, label, self.color, self.alignment, func)
+	    self.heightOffsetPos = self.heightOffsetPos + 1
+
 	    self.current.append(btn)
 	    
 	    if len(self.current)==1:
@@ -81,8 +79,14 @@ class MyList():
 	        if self.right != None:
 	            btn.controlRight(self.right)
 	else:
+	    if self.heightOffsetPos2==-1:
+	        self.heightOffsetPos2 = self.maxLen-1
+
+	    btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.heightOffsetPos2], self.width, self.height, label, self.color, self.alignment, func)
+	    self.heightOffsetPos2 = self.heightOffsetPos2 - 1
+
 	    self.bottom.append(btn)
-	    btn.setVisible(False)
+	    btn.setVisible(True)
 	    
     def notifyAction(self, action):
 	actionId = action.getId()
@@ -107,7 +111,6 @@ class MyList():
     def moveUp(self):
 	if len(self.bottom)>0:
 	    #move and hide the top item
-	    #if len(self.bottom)>1:
 	    topItem = self.current[0]
 	    topItem.setVisible(False)
 	    self.top.append(topItem)
