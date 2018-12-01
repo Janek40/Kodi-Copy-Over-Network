@@ -5,10 +5,16 @@ import xbmcgui
 import xbmcplugin
 import xbmcaddon
 
+ACTION_NAV_BACK = 92
+ACTION_PREVIOUS_MENU = 10
 
 addon_handle = int(sys.argv[1])
 xbmcplugin.setContent(addon_handle, 'movies')
 addon = xbmcaddon.Addon()
+
+def logMe(text):
+    xbmc.log(text, level=xbmc.LOGNOTICE)
+    
 
 class MyListItem():
     def __init__(self, button, number):
@@ -40,32 +46,48 @@ class MyList():
 	self.current = []
 	self.bottom  = []
 	self.count = 0
+	self.heightOffset = 0
 
     def addItem(self, label, func):
-	btn = self.window.add_button(self.x, self.y, self.width, self.height, label, self.color, self.alignment, func)
+	btn = self.window.add_button(self.x, self.y+self.heightOffset, self.width, self.height, label, self.color, self.alignment, func)
         itm = MyListItem(btn, self.count)
 	self.count = self.count + 1
-
-	self.current.append(itm)
-        #MAKE A LINKED LIST BASICALLY
-	if self.current==1:
-	    if self.up != None:
-	        btn.controlUp(self.up)
-	    if self.down != None:
-	        btn.controlDown(self.down)
-	    if self.left != None:
-	        btn.controlLeft(self.left)
-	    if self.right != None:
-	        btn.controlRight(self.right)
+	
+	if self.maxLen>len(self.current):
+	    self.heightOffset = self.heightOffset + self.height/2
+	    self.current.append(itm)
+	    
+	    if self.current==1:
+	        if self.up != None:
+	            btn.controlUp(self.up)
+	        if self.down != None:
+	            btn.controlDown(self.down)
+	        if self.left != None:
+	            btn.controlLeft(self.left)
+	        if self.right != None:
+	            btn.controlRight(self.right)
+	    else:
+	        #Get the button above it, and set that button's DOWN to this
+	        self.current[itm.getNumber()-1].getButton().controlDown(btn)
+	        #Set this new button's up to the previous button
+	        btn.controlUp(self.current[itm.getNumber()-1].getButton())
+	        if self.down != None:
+	            btn.controlDown(self.down)
+	        if self.left != None:
+	            btn.controlLeft(self.left)
+	        if self.right != None:
+	            btn.controlRight(self.right)
 	else:
-	    btn.controlUp(self.current[itm.getNumber()-1])
-	    if self.down != None:
-	        btn.controlDown(self.down)
-	    if self.left != None:
-	        btn.controlLeft(self.left)
-	    if self.right != None:
-	        btn.controlRight(self.right)
+	    self.bottom.append(itm)
+	    
+    def notifyAction(self, action):
+        logMe("success!")       
 
+    def getTail(self):
+        return self.current[len(self.current)-1].getButton()
+
+    def getHead(self):
+        return self.current[0].getButton()
 
 class MyWindow(xbmcgui.WindowDialog):
     def __init__(self):
@@ -77,28 +99,15 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt5 = self.add_button(700, 500, 250, 80, 'Bt5', '0xFF00FFFF', 6, self.refresh_list)
 	bt6 = self.add_button(700, 600, 250, 80, 'Bt6', '0xFF00FFFF', 6, self.refresh_list)
         
-	myList = MyList(self, 360, 160, 300, 200, '0xFFDC143C', 6, 5, None, bt1, None, None)
+	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 3, None, bt1, None, None)
 	myList.addItem("Bleach Episode 01", self.refresh_list)
 	myList.addItem("Bleach Episode 02", self.refresh_list)
 	myList.addItem("Bleach Episode 03", self.refresh_list)
+	myList.addItem("Bleach Episode 04", self.refresh_list)
+	myList.addItem("Bleach Episode 05", self.refresh_list)
+        self.add_action_observer(myList)
 
-	'''
-	myList = xbmcgui.ControlList(360, 160, 300, 200, selectedColor='0xFFDC143C')
-	self.addControl(myList)
-	myList.addItem("Bleach Episode 01")
-        myList.addItem("Bleach Episode 02")
-        myList.addItem("Bleach Episode 03")
-        myList.addItem("Bleach Episode 04")
-        myList.addItem("Bleach Episode 05")
-        myList.addItem("Bleach Episode 06")
-        myList.addItem("Bleach Episode 07")
-        myList.addItem("Bleach Episode 08")
-        myList.addItem("Bleach Episode 09")
-	
-	myList.selectItem(0)
-	'''
-
-	bt1.setNavigation(bt1, bt2, bt1, bt3)
+	bt1.setNavigation(myList.getTail(), bt2, bt1, bt3)
         bt2.setNavigation(bt1, bt2, bt2, bt4)
 	bt3.setNavigation(bt3, bt4, bt1, bt5)
 	bt4.setNavigation(bt3, bt4, bt2, bt6)
@@ -112,6 +121,20 @@ class MyWindow(xbmcgui.WindowDialog):
     
     def initial_setup(self):
         self.buttons = {}
+	self.ActionObservers = []
+
+    def add_action_observer(self, observer):
+        self.ActionObservers.append(observer)
+
+    def onAction(self, action):
+        actionId = action.getId()
+	if actionId == ACTION_PREVIOUS_MENU or actionId == ACTION_NAV_BACK:
+	    self.close()
+	else:
+	    for ob in self.ActionObservers:
+	        ob.notifyAction(action)
+
+	    
 
     def add_button(self, x, y, xLen, yLen, text, focusedColor, alignment, func):
         actBtn = xbmcgui.ControlButton(x, y, xLen, yLen, text, focusedColor=focusedColor, alignment=alignment)
@@ -119,9 +142,6 @@ class MyWindow(xbmcgui.WindowDialog):
 	self.buttons[actBtn.getId()] = func
 	return actBtn
    
-    def logMe(self, text):
-	xbmc.log(text, level=xbmc.LOGNOTICE)
-    
     def refresh_list(self):
 	xbmc.log("Refreshing list", level=xbmc.LOGNOTICE)
     
