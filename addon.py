@@ -7,6 +7,8 @@ import xbmcaddon
 
 ACTION_NAV_BACK = 92
 ACTION_PREVIOUS_MENU = 10
+ACTION_DOWN = 4
+ACTION_UP = 3
 
 addon_handle = int(sys.argv[1])
 xbmcplugin.setContent(addon_handle, 'movies')
@@ -47,14 +49,16 @@ class MyList():
 	self.bottom  = []
 	self.count = 0
 	self.heightOffset = 0
+	self.SCROLL_DOWN = False
+	self.SCROLL_UP = False
 
     def addItem(self, label, func):
 	btn = self.window.add_button(self.x, self.y+self.heightOffset, self.width, self.height, label, self.color, self.alignment, func)
         itm = MyListItem(btn, self.count)
 	self.count = self.count + 1
 	
+	self.heightOffset = self.heightOffset + self.height/2
 	if self.maxLen>len(self.current):
-	    self.heightOffset = self.heightOffset + self.height/2
 	    self.current.append(itm)
 	    
 	    if self.current==1:
@@ -79,9 +83,61 @@ class MyList():
 	            btn.controlRight(self.right)
 	else:
 	    self.bottom.append(itm)
+	    itm.getButton().setVisible(False)
 	    
     def notifyAction(self, action):
-        logMe("success!")       
+	actionId = action.getId()
+        if actionId == ACTION_DOWN:
+	    self.SCROLL_UP = False
+	    if self.SCROLL_DOWN == True:
+	        self.moveUp()
+	    else:
+	        itemId = self.window.getFocusId()
+	        #If the focused item is the last in the list, then the next down press needs to scroll the list!
+	        if itemId == self.current[len(self.current)-1].getButton().getId():
+	            self.SCROLL_DOWN = True
+        elif actionId == ACTION_UP:
+	    self.SCROLL_DOWN = False
+	    if self.SCROLL_UP == True:
+	        self.moveDown()
+	    else:
+	        itemId = self.window.getFocusId()
+		if itemId == self.current[0].getButton().getId():
+		    self.SCROLL_UP = True
+
+    def moveUp(self):
+	if len(self.bottom)>0:
+	    #move and hide the top item
+	    #if len(self.bottom)>1:
+	    topItem = self.current[0]
+	    topItem.getButton().setVisible(False)
+	    self.top.append(topItem)
+	    del self.current[0]
+	    #show the item in the bottom list
+	    oldBottom = self.current[len(self.current)-1]
+	    newBottom = self.bottom[0]
+	    newBottom.getButton().setVisible(True)
+	    self.window.setFocus(newBottom.getButton())
+	    oldBottom.getButton().controlDown(newBottom.getButton())
+	    newBottom.getButton().controlUp(oldBottom.getButton())
+	    self.current.append(newBottom)
+	    del self.bottom[0]
+
+
+    
+    def moveDown(self):
+        if len(self.top)>0:
+	    #Move and hide the bottom item
+	    bottomItem = self.current[len(self.current)-1]
+	    bottomItem.getButton().setVisible(False)
+	    self.bottom.insert(0, bottomItem)
+	    del self.current[len(self.current)-1]
+	    #Show and add the new top item
+	    newTop = self.top[len(self.top)-1]
+	    newTop.getButton().setVisible(True)
+	    self.window.setFocus(newTop.getButton())
+	    self.current.insert(0, newTop)
+	    del self.top[len(self.top)-1]
 
     def getTail(self):
         return self.current[len(self.current)-1].getButton()
@@ -99,13 +155,15 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt5 = self.add_button(700, 500, 250, 80, 'Bt5', '0xFF00FFFF', 6, self.refresh_list)
 	bt6 = self.add_button(700, 600, 250, 80, 'Bt6', '0xFF00FFFF', 6, self.refresh_list)
         
-	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 3, None, bt1, None, None)
+	myList = MyList(self, 360, 160, 350, 50, '0xFFDC143C', 6, 3, None, None, None, None)
 	myList.addItem("Bleach Episode 01", self.refresh_list)
 	myList.addItem("Bleach Episode 02", self.refresh_list)
 	myList.addItem("Bleach Episode 03", self.refresh_list)
 	myList.addItem("Bleach Episode 04", self.refresh_list)
 	myList.addItem("Bleach Episode 05", self.refresh_list)
         self.add_action_observer(myList)
+        
+	self.setFocus(myList.getHead())
 
 	bt1.setNavigation(myList.getTail(), bt2, bt1, bt3)
         bt2.setNavigation(bt1, bt2, bt2, bt4)
@@ -113,7 +171,7 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt4.setNavigation(bt3, bt4, bt2, bt6)
 	bt5.setNavigation(bt5, bt6, bt3, bt5)
 	bt6.setNavigation(bt5, bt6, bt4, bt6)
-	self.setFocus(bt1)
+	#self.setFocus(bt1)
 
 		
 	loc = addon.getAddonInfo('path') + '/resources/image.png'
