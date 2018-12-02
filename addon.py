@@ -104,17 +104,24 @@ class MyList():
 	    self.heightOffsetPos = self.heightOffsetPos + 1
 	    self.current.append(btn)
 	    if len(self.current)>1:
-		self.current[len(self.current)-2].controlDown(btn)
-	        btn.controlUp(self.current[len(self.current)-2])
+		idx = len(self.current)-2
+		self.current[idx].controlDown(btn)
+	        btn.controlUp(self.current[idx])
 
 	else:
 	    btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.maxLen-1], self.width, self.height, label, self.color, self.alignment, func)
 	    btn.setVisible(False)
 	    self.bottom.append(btn)
-    
+	    if len(self.bottom)>1:
+	        idx = len(self.bottom)-2
+		self.bottom[idx].controlDown(btn)
+		btn.controlUp(self.bottom[idx])
+            else:
+	        self.current[len(self.current)-1].controlDown(btn)
+		btn.controlUp(self.current[len(self.current)-1])
+
     def notifyAction(self, action):
 	actionId = action.getId()
-        logMe(str(actionId))
 	if actionId == ACTION_DOWN:
 	    self.SCROLL_UP = False
 	    if self.SCROLL_DOWN == True:
@@ -146,9 +153,8 @@ class MyList():
 	    del self.current[0]
 	    #move up
 	    for curr in self.current:
-	        currY = curr.getY()
-		newY = currY-self.height/2
-		curr.setPosition(curr.getX(), newY)
+	        currY = curr.getY()-self.height/2
+		curr.setPosition(curr.getX(), currY)
 	    #Set the left thing
 	    if self.left != None:
 	        self.left.controlRight(self.current[0])
@@ -158,9 +164,6 @@ class MyList():
 	    newBottom = self.bottom[0]
 	    newBottom.setVisible(True)
 	    self.window.setFocus(newBottom)
-	    oldBottom = self.current[len(self.current)-1]
-	    newBottom.controlUp(oldBottom)
-	    oldBottom.controlDown(newBottom)
 	    self.current.append(newBottom)
 	    del self.bottom[0]
 	else:
@@ -170,24 +173,24 @@ class MyList():
     
     def moveDown(self):
         if len(self.top)>0:
+	    idxCurr = len(self.current)-1
+	    idxTopp = len(self.top)-1
 	    #Move and hide the bottom item
-	    bottomItem = self.current[len(self.current)-1]
-	    bottomItem.controlDown(bottomItem)
+	    bottomItem = self.current[idxCurr]
 	    bottomItem.setVisible(False)
 	    self.bottom.insert(0, bottomItem)
-	    del self.current[len(self.current)-1]
+	    del self.current[idxCurr]
 	    #Move down
 	    for curr in self.current:
-	        currY = curr.getY()
-		newY = currY+self.height/2
-		curr.setPosition(curr.getX(), newY)
+	        currY = curr.getY()+self.height/2
+		curr.setPosition(curr.getX(), currY)
 	    
 	    #Show and add the new top item
-	    newTop = self.top[len(self.top)-1]
+	    newTop = self.top[idxTopp]
 	    newTop.setVisible(True)
 	    self.window.setFocus(newTop)
 	    self.current.insert(0, newTop)
-	    del self.top[len(self.top)-1]
+	    del self.top[idxTopp]
 	    if self.left != None:
 	        self.left.controlRight(self.current[0])
 	    if self.right != None:
@@ -210,8 +213,8 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt3 = self.add_button(650, 300, 250, 80, 'Bt3', '0xFF00FFFF', 6, self.refresh_list)
 	bt4 = self.add_button(340, 500, 250, 80, 'Bt4', '0xFF00FFFF', 6, self.refresh_list)
         
-	myList = MyList(self, 360, 300, 350, 50, '0xFFDC143C', 6, 3)
-	for x in range(4):
+	myList = MyList(self, 360, 300, 350, 50, '0xFFDC143C', 6, 15)
+	for x in range(50):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
 	myList.setControls(bt1, bt4, bt2, bt3)
