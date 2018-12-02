@@ -52,6 +52,7 @@ class MyList():
 	self.down = down
 	self.left = left
 	self.right = right
+	
 	if left != None and right != None:
 	    for x in self.top:
 	        x.controlLeft(left)
@@ -101,18 +102,16 @@ class MyList():
 
 	    btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.heightOffsetPos], self.width, self.height, label, self.color, self.alignment, func)
 	    self.heightOffsetPos = self.heightOffsetPos + 1
-
 	    self.current.append(btn)
-	    
 	    if len(self.current)>1:
 		self.current[len(self.current)-2].controlDown(btn)
 	        btn.controlUp(self.current[len(self.current)-2])
+
 	else:
 	    btn = self.window.add_button(self.x, self.y+self.heightOffsets[self.maxLen-1], self.width, self.height, label, self.color, self.alignment, func)
-
-	    self.bottom.append(btn)
 	    btn.setVisible(False)
-	    
+	    self.bottom.append(btn)
+    
     def notifyAction(self, action):
 	actionId = action.getId()
         logMe(str(actionId))
