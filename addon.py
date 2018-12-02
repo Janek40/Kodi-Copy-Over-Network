@@ -1,8 +1,5 @@
 import sys
-import urllib
-import urlparse
 import xbmcgui
-import xbmcplugin
 import xbmcaddon
 
 ACTION_NAV_BACK = 92
@@ -12,8 +9,7 @@ ACTION_UP = 3
 ACTION_LEFT = 1
 ACTION_RIGHT = 2
 
-addon_handle = int(sys.argv[1])
-xbmcplugin.setContent(addon_handle, 'movies')
+#addon_handle = int(sys.argv[1])
 addon = xbmcaddon.Addon()
 
 def logMe(text):
@@ -205,7 +201,7 @@ class MyList():
     def getHead(self):
         return self.current[0]
 
-class MyWindow(xbmcgui.WindowDialog):
+class MyWindow(xbmcgui.Window):
     def __init__(self):
         self.initial_setup()
 	bt1 = self.add_button(340, 200, 220, 80, 'Bt1', '0xFF00FFFF', 6, self.refresh_list)	
@@ -213,8 +209,8 @@ class MyWindow(xbmcgui.WindowDialog):
 	bt3 = self.add_button(650, 300, 250, 80, 'Bt3', '0xFF00FFFF', 6, self.refresh_list)
 	bt4 = self.add_button(340, 500, 250, 80, 'Bt4', '0xFF00FFFF', 6, self.refresh_list)
         
-	myList = MyList(self, 360, 300, 350, 50, '0xFFDC143C', 6, 15)
-	for x in range(50):
+	myList = MyList(self, 360, 300, 350, 50, '0xFFDC143C', 6, 10)
+	for x in range(10):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
 	myList.setControls(bt1, bt4, bt2, bt3)
@@ -224,7 +220,7 @@ class MyWindow(xbmcgui.WindowDialog):
 		
 	loc = addon.getAddonInfo('path') + '/resources/image.png'
         #self.addControl(xbmcgui.ControlImage (400, 200, 400, 400, loc))
-    
+
     def initial_setup(self):
         self.buttons = {}
 	self.ActionObservers = []
