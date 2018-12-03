@@ -1,6 +1,4 @@
-import sys
-import xbmcgui
-import xbmcaddon
+import xbmc, xbmcgui, xbmcaddon
 
 ACTION_NAV_BACK = 92
 ACTION_PREVIOUS_MENU = 10
@@ -203,7 +201,8 @@ class MyList():
 
 class MyWindow(xbmcgui.Window):
     def __init__(self):
-        self.initial_setup()
+	self.show()
+	self.initial_setup()
 	bt1 = self.add_button(340, 200, 220, 80, 'Bt1', '0xFF00FFFF', 6, self.refresh_list)	
 	bt2 = self.add_button(100, 300, 220, 80, 'Bt2', '0xFF00FFFF', 6, self.refresh_list)
 	bt3 = self.add_button(650, 300, 250, 80, 'Bt3', '0xFF00FFFF', 6, self.refresh_list)
@@ -217,14 +216,13 @@ class MyWindow(xbmcgui.Window):
         
 	self.setFocus(myList.getHead())
 
-		
-	loc = addon.getAddonInfo('path') + '/resources/image.png'
-        #self.addControl(xbmcgui.ControlImage (400, 200, 400, 400, loc))
-
+	#loc = addon.getAddonInfo('path') + '/resources/image.png'
+        #self.addControl(xbmcgui.ControlImage (0, 0, 400, 400, loc))
+    
     def initial_setup(self):
         self.buttons = {}
 	self.ActionObservers = []
-
+    
     def add_action_observer(self, observer):
         self.ActionObservers.append(observer)
 
@@ -237,7 +235,6 @@ class MyWindow(xbmcgui.Window):
 	        ob.notifyAction(action)
 
 	    
-
     def add_button(self, x, y, xLen, yLen, text, focusedColor, alignment, func):
         actBtn = xbmcgui.ControlButton(x, y, xLen, yLen, text, focusedColor=focusedColor, alignment=alignment)
 	self.addControl(actBtn)
@@ -253,7 +250,8 @@ class MyWindow(xbmcgui.Window):
     def onControl(self, control):
 	self.buttons[control.getId()]()
 
-
 Win = MyWindow()
 Win.doModal()
 del Win
+xbmc.executebuiltin("XBMC.Container.Update(path,replace)")
+xbmc.executebuiltin("XBMC.ActivateWindow(Home)")
