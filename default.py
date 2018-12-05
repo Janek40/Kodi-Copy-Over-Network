@@ -24,15 +24,22 @@ class MyMover():
     
     def notifyAction(self, action):
         actionId = action.getId()
+	ans = False
 	if actionId == ACTION_DOWN:
 	    self.currBtn.setPosition(self.currBtn.getX(), self.currBtn.getY()+self.inc)
+	    ans = True
 	elif actionId == ACTION_UP:
 	    self.currBtn.setPosition(self.currBtn.getX(), self.currBtn.getY()-self.inc)
+	    ans = True
         elif actionId == ACTION_LEFT:
 	    self.currBtn.setPosition(self.currBtn.getX()-self.inc, self.currBtn.getY())
+	    ans = True
         elif actionId == ACTION_RIGHT:
 	    self.currBtn.setPosition(self.currBtn.getX()+self.inc, self.currBtn.getY())
-
+	    ans = True
+        
+	if ans == True:
+	    logMe("X: " + str(self.currBtn.getX()) + ", Y: " + str(self.currBtn.getY()))
 
 from List import List
 class MyWindow(xbmcgui.Window):
