@@ -14,24 +14,29 @@ class MyWindow(xbmcgui.Window):
     def __init__(self):
 	self.show()
 	self.initial_setup()
-	bt1 = self.add_button(340, 200, 220, 80, 'Bt1', '0xFF00FFFF', 6, self.refresh_list)	
-	bt2 = self.add_button(100, 300, 220, 80, 'Bt2', '0xFF00FFFF', 6, self.refresh_list)
-	bt3 = self.add_button(650, 300, 250, 80, 'Bt3', '0xFF00FFFF', 6, self.refresh_list)
-	bt4 = self.add_button(340, 500, 250, 80, 'Bt4', '0xFF00FFFF', 6, self.refresh_list)
+        refreshList = self.add_button(340, 200, 220, 80, 'Refresh List', '0xFF00FFFF', 6, self.refresh_list)	
+	downloadSelected = self.add_button(100, 300, 220, 80, 'Download Selected', '0xFF00FFFF', 6, self.stub)
+	deselectAll = self.add_button(650, 300, 250, 80, 'Deselect All', '0xFF00FFFF', 6, self.stub)
+	changeDestinationFolder = self.add_button(340, 500, 250, 80, 'Change Destination Folder', '0xFF00FFFF', 6, self.stub)
+	DEBUG_OTHER = self.add_button(650, 300, 250, 80, 'DEBUG_OTHER', '0xFF00FFFF', 6, self.stub)
         
 	myList = List(self, 360, 300, 350, 50, '0xFFDC143C', 6, 10)
 	for x in range(10):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
-	myList.setControls(bt1, bt4, bt2, bt3)
-        
+	#myList.setControls(bt1, bt4, bt2, bt3)
+
 	self.setFocus(myList.getHead())
 
 	#loc = addon.getAddonInfo('path') + '/resources/image.png'
         #self.addControl(xbmcgui.ControlImage (0, 0, 400, 400, loc))
     
     def initial_setup(self):
-        self.buttons = {}
+        width = self.getWidth()
+	height = self.getHeight()
+	midX = width/2
+	midY = height/2
+	self.buttons = {}
 	self.ActionObservers = []
     
     def add_action_observer(self, observer):
@@ -51,12 +56,15 @@ class MyWindow(xbmcgui.Window):
 	self.addControl(actBtn)
 	self.buttons[actBtn.getId()] = func
 	return actBtn
-   
+    
+    def stub(self):
+        logMe("Something was pressed")
+
     def refresh_list(self):
 	xbmc.log("Refreshing list", level=xbmc.LOGNOTICE)
     
-    def copy_selected(self):
-	xbmc.log("Copying selected", level=xbmc.LOGNOTICE)
+    def downloadSelected(self):
+	xbmc.log("Downloading selected", level=xbmc.LOGNOTICE)
 
     def onControl(self, control):
 	self.buttons[control.getId()]()
