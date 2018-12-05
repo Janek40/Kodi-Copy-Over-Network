@@ -47,31 +47,39 @@ class MyWindow(xbmcgui.Window):
 	self.show()
 	self.setCoordinateResolution(0)
 	self.initial_setup()
+	logMe("____")
 	
-	self.minX = -55
-	self.minY = -20
-	#640x480
-	#self.maxX = 584
-	#self.maxY = 700
-	#1920x1080
-	self.maxX = 1920-self.abs(self.minX)
-	self.maxY = 1080-self.abs(self.minY)
+	minX = -55
+	minY = -20
+	maxX = 1920-self.abs(minX)
+	maxY = 1080-self.abs(minY)
+	middle = minX+self.getWidth()/2
         
 
-	refreshList = self.add_button(self.minX, self.minY, 220, 80, 'Refresh List', '0xFF00FFFF', 6, self.refresh_list)	
-	downloadSelected = self.add_button(self.minX+self.getWidth()/2, self.minY, 370, 80, 'Download Selected', '0xFF00FFFF', 6, self.stub)
-	deselectAll = self.add_button(650, 300, 250, 80, 'Deselect All', '0xFF00FFFF', 6, self.stub)
-	changeDestinationFolder = self.add_button(340, 500, 250, 80, 'Change Destination Folder', '0xFF00FFFF', 6, self.stub)
-	DEBUG_OTHER = self.add_button(650, 300, 250, 80, 'DEBUG_OTHER', '0xFF00FFFF', 6, self.stub)
+	refreshList =             self.add_button(480, 170, 340, 80, 'Refresh List', '0xFF00FFFF', 6, self.refresh_list)	
+	downloadSelected =        self.add_button(316, 230, 560, 80, 'Download Selected', '0xFF00FFFF', 6, self.stub)
+	deselectAll =             self.add_button(480, 290, 340, 80, 'Deselect All', '0xFF00FFFF', 6, self.stub)
+	changeDestinationFolder = self.add_button(980, 170, 770, 80, 'Change Destination Folder', '0xFF00FFFF', 6, self.stub)
+	DEBUG_OTHER =             self.add_button(1062, 230, 450, 80, 'DEBUG_OTHER', '0xFF00FFFF', 6, self.stub)
 	
-	#self.add_action_observer(MyMover(refreshList2, 10))
-	#-85
-	#-10
-	myList = List(self, self.minX+self.getWidth()/2, self.minY, 350, 50, '0xFFDC143C', 6, 10)
-	for x in range(10):
+	refreshList.controlDown(downloadSelected)
+	downloadSelected.controlUp(refreshList)
+	downloadSelected.controlRight(refreshList)
+	downloadSelected.controlDown(deselectAll)
+	deselectAll.controlUp(downloadSelected)
+	deselectAll.controlRight(downloadSelected)
+
+	changeDestinationFolder.controlDown(DEBUG_OTHER)
+	DEBUG_OTHER.controlUp(changeDestinationFolder)
+	DEBUG_OTHER.controlLeft(changeDestinationFolder)
+        
+	#self.add_action_observer(MyMover(DEBUG_OTHER, 1))
+	
+	myList = List(self, middle-130, minY+195, 600, 60, '0xFFDC143C', 6, 20)
+	for x in range(21):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
-	#myList.setControls(bt1, bt4, bt2, bt3)
+	myList.setControls(None, None, refreshList, changeDestinationFolder)
 
 	self.setFocus(myList.getHead())
 
