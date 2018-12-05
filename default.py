@@ -13,14 +13,21 @@ from List import List
 class MyWindow(xbmcgui.Window):
     def __init__(self):
 	self.show()
+	self.setCoordinateResolution(1)
 	self.initial_setup()
-        refreshList = self.add_button(340, 200, 220, 80, 'Refresh List', '0xFF00FFFF', 6, self.refresh_list)	
-	downloadSelected = self.add_button(100, 300, 220, 80, 'Download Selected', '0xFF00FFFF', 6, self.stub)
+	
+	refreshList = self.add_button(0, 0, 220, 80, 'Refresh List', '0xFF00FFFF', 4, self.refresh_list)	
+	refreshList = self.add_button(, 600, 220, 80, 'Refresh List', '0xFF00FFFF', 6, self.refresh_list)	
+	downloadSelected = self.add_button(self.getWidth(), self.getHeight(), 370, 80, 'Download Selected', '0xFF00FFFF', 6, self.stub)
+	
+	'''
 	deselectAll = self.add_button(650, 300, 250, 80, 'Deselect All', '0xFF00FFFF', 6, self.stub)
 	changeDestinationFolder = self.add_button(340, 500, 250, 80, 'Change Destination Folder', '0xFF00FFFF', 6, self.stub)
 	DEBUG_OTHER = self.add_button(650, 300, 250, 80, 'DEBUG_OTHER', '0xFF00FFFF', 6, self.stub)
-        
-	myList = List(self, 360, 300, 350, 50, '0xFFDC143C', 6, 10)
+        '''
+	#-85
+	#-10
+	myList = List(self, 200, 200, 350, 50, '0xFFDC143C', 6, 10)
 	for x in range(10):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
@@ -32,10 +39,10 @@ class MyWindow(xbmcgui.Window):
         #self.addControl(xbmcgui.ControlImage (0, 0, 400, 400, loc))
     
     def initial_setup(self):
-        width = self.getWidth()
-	height = self.getHeight()
-	midX = width/2
-	midY = height/2
+        self.width = self.getWidth()
+	self.height = self.getHeight()
+	self.midX = self.width/2
+	self.midY = self.height/2
 	self.buttons = {}
 	self.ActionObservers = []
     
