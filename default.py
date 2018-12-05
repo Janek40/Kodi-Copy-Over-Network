@@ -74,8 +74,7 @@ class MyWindow(xbmcgui.Window):
 	DEBUG_OTHER.controlLeft(changeDestinationFolder)
         
 	#self.add_action_observer(MyMover(DEBUG_OTHER, 1))
-	
-	myList = List(self, middle-130, minY+195, 600, 60, '0xFFDC143C', 6, 20)
+	myList = List(self, 655, 175, 600, 60, '0xFFDC143C', 6, 20)
 	for x in range(21):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
@@ -93,6 +92,7 @@ class MyWindow(xbmcgui.Window):
 	    return val
 
     def initial_setup(self):
+	self.setCoordinateResolution(0)
 	self.buttons = {}
 	self.ActionObservers = []
     
