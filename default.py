@@ -2,6 +2,13 @@ import xbmc, xbmcgui, xbmcaddon
 
 ACTION_NAV_BACK = 92
 ACTION_PREVIOUS_MENU = 10
+ACTION_NAV_BACK = 92
+ACTION_PREVIOUS_MENU = 10
+ACTION_DOWN = 4
+ACTION_UP = 3
+ACTION_LEFT = 1
+ACTION_RIGHT = 2
+
 
 #addon_handle = int(sys.argv[1])
 addon = xbmcaddon.Addon()
@@ -9,25 +16,51 @@ addon = xbmcaddon.Addon()
 def logMe(text):
     xbmc.log(text, level=xbmc.LOGNOTICE)
     
+
+class MyMover():
+    def __init__(self, currBtn, inc):
+        self.currBtn = currBtn
+	self.inc = inc
+    
+    def notifyAction(self, action):
+        actionId = action.getId()
+	if actionId == ACTION_DOWN:
+	    self.currBtn.setPosition(self.currBtn.getX(), self.currBtn.getY()+self.inc)
+	elif actionId == ACTION_UP:
+	    self.currBtn.setPosition(self.currBtn.getX(), self.currBtn.getY()-self.inc)
+        elif actionId == ACTION_LEFT:
+	    self.currBtn.setPosition(self.currBtn.getX()-self.inc, self.currBtn.getY())
+        elif actionId == ACTION_RIGHT:
+	    self.currBtn.setPosition(self.currBtn.getX()+self.inc, self.currBtn.getY())
+
+
 from List import List
 class MyWindow(xbmcgui.Window):
     def __init__(self):
 	self.show()
-	self.setCoordinateResolution(1)
+	self.setCoordinateResolution(0)
 	self.initial_setup()
 	
-	refreshList = self.add_button(0, 0, 220, 80, 'Refresh List', '0xFF00FFFF', 4, self.refresh_list)	
-	refreshList = self.add_button(, 600, 220, 80, 'Refresh List', '0xFF00FFFF', 6, self.refresh_list)	
-	downloadSelected = self.add_button(self.getWidth(), self.getHeight(), 370, 80, 'Download Selected', '0xFF00FFFF', 6, self.stub)
-	
-	'''
+	self.minX = -55
+	self.minY = -20
+	#640x480
+	#self.maxX = 584
+	#self.maxY = 700
+	#1920x1080
+	self.maxX = 1920-self.abs(self.minX)
+	self.maxY = 1080-self.abs(self.minY)
+        
+
+	refreshList = self.add_button(self.minX, self.minY, 220, 80, 'Refresh List', '0xFF00FFFF', 6, self.refresh_list)	
+	downloadSelected = self.add_button(self.minX+self.getWidth()/2, self.minY, 370, 80, 'Download Selected', '0xFF00FFFF', 6, self.stub)
 	deselectAll = self.add_button(650, 300, 250, 80, 'Deselect All', '0xFF00FFFF', 6, self.stub)
 	changeDestinationFolder = self.add_button(340, 500, 250, 80, 'Change Destination Folder', '0xFF00FFFF', 6, self.stub)
 	DEBUG_OTHER = self.add_button(650, 300, 250, 80, 'DEBUG_OTHER', '0xFF00FFFF', 6, self.stub)
-        '''
+	
+	#self.add_action_observer(MyMover(refreshList2, 10))
 	#-85
 	#-10
-	myList = List(self, 200, 200, 350, 50, '0xFFDC143C', 6, 10)
+	myList = List(self, self.minX+self.getWidth()/2, self.minY, 350, 50, '0xFFDC143C', 6, 10)
 	for x in range(10):
 	    myList.addItem("Bleach Episode " + str(x+1), self.refresh_list)
         self.add_action_observer(myList)
@@ -38,11 +71,13 @@ class MyWindow(xbmcgui.Window):
 	#loc = addon.getAddonInfo('path') + '/resources/image.png'
         #self.addControl(xbmcgui.ControlImage (0, 0, 400, 400, loc))
     
+    def abs(self, val):
+        if val < 0:
+	    return val*-1
+	else:
+	    return val
+
     def initial_setup(self):
-        self.width = self.getWidth()
-	self.height = self.getHeight()
-	self.midX = self.width/2
-	self.midY = self.height/2
 	self.buttons = {}
 	self.ActionObservers = []
     
@@ -79,5 +114,5 @@ class MyWindow(xbmcgui.Window):
 Win = MyWindow()
 Win.doModal()
 del Win
-xbmc.executebuiltin("XBMC.Container.Update(path,replace)")
+#xbmc.executebuiltin("XBMC.Container.Update(path,replace)")
 xbmc.executebuiltin("XBMC.ActivateWindow(Home)")
