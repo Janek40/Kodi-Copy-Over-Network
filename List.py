@@ -32,7 +32,7 @@ class List():
 	self.down = None
 	self.left = None
 	self.right = None
-
+        
 	self.heightOffsets = []
 	for x in range(maxLen):
 	    self.heightOffsets.append(self.heightOffset)
@@ -129,12 +129,14 @@ class List():
 	        self.moveDown()
 	    else:
 	        itemId = self.window.getFocusId()
-		if itemId == self.current[0].getId():
-		    self.SCROLL_UP = True
+		if len(self.current)>0:
+		    if itemId == self.current[0].getId():
+		        self.SCROLL_UP = True
 	elif actionId == ACTION_LEFT or actionId == ACTION_RIGHT:
 	    itemId = self.window.getFocusId()
-	    if itemId == self.current[0].getId():
-	        self.SCROLL_UP = True
+	    if len(self.current)>0:
+	        if itemId == self.current[0].getId():
+	            self.SCROLL_UP = True
 
     def moveUp(self):
 	if len(self.bottom)>0:
@@ -192,7 +194,13 @@ class List():
 	        self.window.setFocus(self.up)
 
     def getTail(self):
-        return self.current[len(self.current)-1]
+        if len(self.current)>0:
+	    return self.current[len(self.current)-1]
+        else:
+	    return -1
 
     def getHead(self):
-        return self.current[0]
+        if len(self.current)>0:
+	    return self.current[0]
+	else:
+	    return -1
