@@ -45,16 +45,14 @@ from List import List
 class MyWindow(xbmcgui.Window):
     def __init__(self):
 	self.show()
-	self.setCoordinateResolution(0)
 	self.initial_setup()
-	logMe("____")
 	
-	minX = -55
-	minY = -20
-	maxX = 1920-self.abs(minX)
-	maxY = 1080-self.abs(minY)
-	middle = minX+self.getWidth()/2
-        
+	#logMe("____")
+	#minX = -55
+	#minY = -20
+	#maxX = 1920-self.abs(minX)
+	#maxY = 1080-self.abs(minY)
+	#middle = minX+self.getWidth()/2
 
 	refreshList =             self.add_button(480, 170, 340, 80, 'Refresh List', '0xFF00FFFF', 6, self.refresh_list)	
 	downloadSelected =        self.add_button(316, 230, 560, 80, 'Download Selected', '0xFF00FFFF', 6, self.stub)
